@@ -85,6 +85,31 @@ connectionComplete = () => {
     userPrompt();
 };
 
+addDepartment = () => {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "addDepartmentPrompt",
+            message: "Department to add: ",
+            validate: addDepartmentPrompt => {
+                if(addDepartmentPrompt) {
+                    return true;
+                }
+                else {
+                    console.log("Enter a valid department.");
+                    return false;
+                }
+            }
+        }
+    ]).then(answer => {
+        connection.query(sql, answer.addDepartmentPrompt, (err, result) => {
+            if (err) throw err;
+            console.log("Added" + answer.addDepartmentPrompt + "department.");
+            viewDepartments();
+        });
+    });
+};
+
 viewDepartments = () => {
     console.log("Pulling up all departments.\n");
     connection.promise().query(sql, (err, rows) => {
@@ -109,30 +134,5 @@ viewEmployees = () => {
         if (err) throw err;
         console.table(rows);
         userPrompt();
-    });
-};
-
-addDepartment = () => {
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "addDepartmentPrompt",
-            message: "Department to add: ",
-            validate: addDepartmentPrompt => {
-                if(addDepartmentPrompt) {
-                    return true;
-                }
-                else {
-                    console.log("Enter a valid department.");
-                    return false;
-                }
-            }
-        }
-    ]).then(answer => {
-        connection.query(sql, answer.addDepartmentPrompt, (err, result) => {
-            if (err) throw err;
-            console.log("Added" + answer.addDepartmentPrompt + "department.");
-            viewDepartments();
-        });
     });
 };
