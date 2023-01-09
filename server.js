@@ -1,17 +1,12 @@
-const mysql = require("mysql2");
+const db = require("./db");
 const inquirer = require("inquirer");
-const consoleTable = require("console.table");
+require("console.table");
 require("dotenv").config();
-const connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    pasword: process.env.MYSQL_PASSWORD,
-    database: "employee_db"
-});
-const userPrompt = () => {
+
+function userPrompt () {
     inquirer.prompt ([
         {
-            tpye: "list",
+            type: "list",
             name: "choices",
             message: "Please choose one of the following:",
             choices: ["View All Employees", "Add Employee", "Update Employee Role",
@@ -47,11 +42,12 @@ const userPrompt = () => {
     });
 };
 
-connection.connect(err => {
+
+/*connection.connect(err => {
     if (err) throw err;
     console.log("Connected! Id: " + connection.threadId);
     connectionComplete();
-});
+});*/
 
 connectionComplete = () => {
     console.log("*=====================================================*");
@@ -73,13 +69,15 @@ connectionComplete = () => {
     userPrompt();
 };
 
-viewEmployees = () => {
-    console.log("Pulling up all employees.\n");
-    connection.promise().query(sql, (err, rows) => {
-        if (err) throw err;
-        console.table(rows);
-        userPrompt();
-    });
+connectionComplete();
+
+function viewEmployees () {
+    db.findAllEmployee()
+    .then(([rows]) => {
+        let employees = rows;
+        console.table(employees);
+    })
+    .then(() => userPrompt())
 };
 
 addEmployee = () => {
@@ -247,10 +245,10 @@ addRole = () => {
         }
     ]).then(answer => {
         const params = [answer.role, answer.salary];
-        const roleSql = `SELCET name, id FROM department`;
+        const roleSql = `SELCET department_name, id FROM department`;
         connection.promise().query(roleSql, (err, data) => {
             if (err) throw err;
-            const dept = data.map(({ name, id}) => ({ name: name, value: id }));
+            const dept = data.map(({ department_name, id}) => ({ name: department_name, value: id }));
             inquirer.prompt([
                 {
                     type: "list",

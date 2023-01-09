@@ -3,27 +3,25 @@ CREATE DATABASE employee_db;
 USE employee_db;
 
 CREATE TABLE department (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(30) NOT NULL
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    department_name VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE role (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(30) NOT NULL,
     salary DECIMAL NOT NULL,
-    department_id INTEGER,
-    INDEX dept_ind (dapartment_id),
-    CONSTRAINT dept_fkey FOREIGN KEY (department_id) REFERENCES department(id) ON DELETE SET NULL
+    department_id INT,
+    INDEX dept_ind (department_id),
+    CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES department(id) ON DELETE SET NULL
 );
 
 CREATE TABLE employee (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
-    role_id INTEGER,
+    role_id INT,
     INDEX role_ind (role_id),
-    CONSTRAINT role_fkey FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE SET NULL,
-    manager_id INTEGER,
-    INDEX manager_ind (manager_id),
-    CONSTRAINT manager_fkey FOREIGN KEY (manager_id) REFERENCES employee(id) ON DELETE SET NULL
+    CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE SET NULL,
+    manager_id INT
 );
