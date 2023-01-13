@@ -1,50 +1,50 @@
-const DB = require("./server");
-const inquirer = require("inquirer");
-require("console.table");
-require("dotenv").config();
-let db = new DB();
+const DB = require("./server"); //Loads the server.js file so we can pull the connection to the database
+const inquirer = require("inquirer"); //Loads inquirer packages and modules
+require("console.table"); //Loads console.table packages and modules
+require("dotenv").config(); //Loads dotenv packages and modules
+let db = new DB(); //Puts the database into a variable to be utilized later on
 
-userPrompt = () => {
-    inquirer.prompt ([
+userPrompt = () => { //The initial menu for the user to select from
+    inquirer.prompt ([ //Runs inquirer so user can make selections
         {
-            type: "list",
-            name: "choices",
-            message: "Please choose one of the following:",
-            choices: ["View All Employees", "Add Employee", "Update Employee Role",
+            type: "list", //The type of prompt
+            name: "choices", //The name of the prompt
+            message: "Please choose one of the following:", //The message the user sees for the prompt
+            choices: ["View All Employees", "Add Employee", "Update Employee Role", //The choices the user has for the menu selection within the prompt
                         "View All Roles", "Add Role", "View All Departments",
                         "Add Department", "Quit"]
         }
-    ]).then((answers) => {
-        const {choices} = answers;
-        if (choices === "View All Employees") {
-            viewEmployees();
+    ]).then((answers) => { //After user selects a menu option we compare the user's choice to where we go to next
+        const {choices} = answers; //Loads the user's choice into a different variable so we dont change the response on accident
+        if (choices === "View All Employees") { //Checks to see if the user selected View All Employees
+            viewEmployees(); //Goes to the viewEmployees function
         }
-        else if (choices === "Add Employee") {
-            addEmployee();
+        else if (choices === "Add Employee") { //Checks to see if the user selected Add Employee
+            addEmployee(); //Goes to the addEmployee function
         }
-        else if (choices === "Update Employee Role") {
-            updateRole();
+        else if (choices === "Update Employee Role") { //Checks to see if the user selected Update Employee Role
+            updateRole(); //Goes to the updateRole function
         }
-        else if (choices === "View All Roles") {
-            viewRoles();
+        else if (choices === "View All Roles") { //Checks to see if the user selected View All Roles
+            viewRoles(); //Goes to the viewRoles function
         }
-        else if (choices === "Add Role") {
-            addRole();
+        else if (choices === "Add Role") { //Checks to see if the user selected Add Role
+            addRole(); //Goes to the addRole function
         }
-        else if (choices === "View All Departments") {
-            viewDepartments();
+        else if (choices === "View All Departments") { //Checks to see if the user selected View All Departments
+            viewDepartments(); //Goes to the viewDepartments function
         }
-        else if (choices === "Add Department") {
-            addDepartment();
+        else if (choices === "Add Department") { //Checks to see if the user selected Add Department
+            addDepartment(); //Goes to the addDepartment function
         }
-        else {
-            db.connection.end();
+        else { //Any other choices not listed above
+            db.connection.end(); //Ends the connection to the database
         };
     });
 };
 
-connectionComplete = () => {
-    console.log("*=====================================================*");
+connectionComplete = () => { //Function that runs when we have connected to the database
+    console.log("*=====================================================*"); //Fancy menu title
     console.log("|                                                     |");
     console.log("|    _____                 _                          |");
     console.log("|   |  ___|_ __ ___  _ __ | | ___  _   _  ___  ___    |");
@@ -60,89 +60,89 @@ connectionComplete = () => {
     console.log("|                             |___/                   |");
     console.log("|                                                     |");
     console.log("*=====================================================*");
-    userPrompt();
+    userPrompt(); //Calls userPrompt function to get user's input for menu selection
 };
 
-connectionComplete();
+connectionComplete(); //Calls the connectionComplete function when we have connected to the database
 
-viewEmployees = () => {
-    const sql = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id;`
-    console.log("Pulling up all employees.\n");
-    db.connection.query(sql, (err, rows) => {
-        if (err) throw err;
-        console.table(rows);
-        userPrompt();
+viewEmployees = () => { //Function that displays all the employees
+    const sql = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id;` //mysql command to access the database
+    console.log("Pulling up all employees.\n"); //Displays to the console to let user know what is going on
+    db.connection.query(sql, (err, rows) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+        if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+        console.table(rows); //Displays the data from the database
+        userPrompt(); //Calls userPrompt function to get user's input for menu selection
     });
 };
 
-addEmployee = () => {
-    inquirer.prompt([
+addEmployee = () => { //Function that adds an employee
+    inquirer.prompt([ //Runs inquirer so user can make selections
         {
-            type: "input",
-            name: "first",
-            message: "First name of employee: ",
-            validate: addFirst => {
-                if (addFirst) {
-                    return true;
+            type: "input", //The type of prompt
+            name: "first", //The name of the prompt
+            message: "First name of employee: ", //The message the user sees for the prompt
+            validate: addFirst => { //Checks to make sure the user entered something
+                if (addFirst) { //If the user entered something valid
+                    return true; //Returns true and continues
                 }
 
-                else {
-                    console.log("Please enter a first name");
-                    return false;
+                else { //If the user entered something invalid
+                    console.log("Please enter a first name"); //Displays to the console that user needs to enter a valid response
+                    return false; //Returns false and lets user try the input again for the prompt
                 }
             }
         },
 
         {
-            type: "input",
-            name: "last",
-            message: "Last name of employee: ",
-            validate: addLast => {
-                if (addLast) {
-                    return true;
+            type: "input", //The type of prompt
+            name: "last", //The name of the prompt
+            message: "Last name of employee: ", //The message the user sees for the prompt
+            validate: addLast => { //Checks to make sure the user entered something
+                if (addLast) { //If the user entered something valid
+                    return true; //Returns true and continues
                 }
 
-                else {
-                    console.log("Please enter a last name");
-                    return false;
+                else { //If the user entered something invalid
+                    console.log("Please enter a last name"); //Displays to the console that user needs to enter a valid response
+                    return false; //Returns false and lets user try the input again for the prompt
                 }
             }
         }
-    ]).then(answer => {
-        const params = [answer.first, answer.last]
-        const roleSql = `SELECT role.id, role.title FROM role;`
-        db.connection.query(roleSql, (err, data) => {
-            if (err) throw err;
-            const roles = data.map(({ id, title }) => ({ name: title, value: id }));
-            inquirer.prompt([
+    ]).then(answer => { //After user enter information we take the information and proceed further into more prompts
+        const params = [answer.first, answer.last]; //Stores the user's respones into an array
+        const roleSql = `SELECT role.id, role.title FROM role;` //mysql command to access the database
+        db.connection.query(roleSql, (err, data) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+            if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+            const roles = data.map(({ id, title }) => ({ name: title, value: id })); //Variable that pulls all the roles available from the database
+            inquirer.prompt([ //Runs inquirer so user can make selections
                 {
-                    type: "list",
-                    name: "role",
-                    message: "Employee's role: ",
-                    choices: roles
+                    type: "list", //The type of prompt
+                    name: "role", //The name of the prompt
+                    message: "Employee's role: ", //The message the user sees for the prompt
+                    choices: roles //The choices the user has for the menu selection within the prompt
                 }
-            ]).then(roleChoice => {
-                const role = roleChoice.role;
-                params.push(role);
-                const managerSql = `SELECT * FROM employee;`
-                db.connection.query(managerSql, (err, data) => {
-                    if (err) throw err;
-                    const managers = data.map(({ id, first_name, last_name }) => ({ name: first_name + " " + last_name, value: id }));
-                    inquirer.prompt([
+            ]).then(roleChoice => { //After user enter information we take the information and proceed further into more prompts
+                const role = roleChoice.role; //The role the user selected is stored as the sole role
+                params.push(role); //The user's selected role is pushed into the database
+                const managerSql = `SELECT * FROM employee;` //mysql command to access the database
+                db.connection.query(managerSql, (err, data) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+                    if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+                    const managers = data.map(({ id, first_name, last_name }) => ({ name: first_name + " " + last_name, value: id })); //Variable that pulls all the managers available from the database
+                    inquirer.prompt([ //Runs inquirer so user can make selections
                         {
-                            type: "list",
-                            name: "manager",
-                            message: "Employee's manager: ",
-                            choices: managers
+                            type: "list", //The type of prompt
+                            name: "manager", //The name of the prompt
+                            message: "Employee's manager: ", //The message the user sees for the prompt
+                            choices: managers //The choices the user has for the menu selection within the prompt
                         }
-                    ]).then(managerChoice => {
-                        const manager = managerChoice.manager;
-                        params.push(manager);
-                        const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);`
-                        db.connection.query(sql, params, (err, result) => {
-                            if (err) throw err;
-                            console.log("Employee has been added");
-                            viewEmployees();
+                    ]).then(managerChoice => { //After user enter information we take the information and proceed further into more prompts
+                        const manager = managerChoice.manager; //The manager the user selected is stored as the sole manager
+                        params.push(manager); //The user's selected manager is pushed into the database
+                        const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);` //mysql command to access the database
+                        db.connection.query(sql, params, (err, result) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+                            if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+                            console.log("Employee has been added"); //Displays to the console to let user know what is going on
+                            viewEmployees(); //Goes to the viewEmployees function
                         });
                     });
                 });
@@ -151,44 +151,44 @@ addEmployee = () => {
     });
 };
 
-updateRole = () => {
-    const employeeSql = `SELECT * FROM employee`;
-    db.connection.query(employeeSql, (err, data) => {
-        if (err) throw err;
-        const employees = data.map(({ id, first_name, last_name }) => ({ name: first_name + " " + last_name, value: id }));
-        inquirer.prompt([
+updateRole = () => { //Function that updates an employee role
+    const employeeSql = `SELECT * FROM employee;` //mysql command to access the database
+    db.connection.query(employeeSql, (err, data) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+        if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+        const employees = data.map(({ id, first_name, last_name }) => ({ name: first_name + " " + last_name, value: id })); //Variable that pulls all the employees available from the database
+        inquirer.prompt([ //Runs inquirer so user can make selections
             {
-                type: "list",
-                name: "name",
-                message: "Employee to update: ",
-                choices: employees
+                type: "list", //The type of prompt
+                name: "name", //The name of the prompt
+                message: "Employee to update: ", //The message the user sees for the prompt
+                choices: employees //The choices the user has for the menu selection within the prompt
             }
-        ]).then(empChoice => {
-            const employee = empChoice.name;
-            const params = [];
-            params.push(employee);
-            const roleSql = `SELECT * FROM role`;
-            db.connection.query(roleSql, (err, data) => {
-                if (err) throw err;
-                const roles = data.map(({ id, title }) => ({ name: title, value: id }));
-                inquirer.prompt([
+        ]).then(empChoice => { //After user enter information we take the information and proceed further into more prompts
+            const employee = empChoice.name; //The employee the user selected is stored as the sole employee
+            const params = []; //The parmas array is cleared out
+            params.push(employee); //The user's selected employee is pushed into the database
+            const roleSql = `SELECT * FROM role;` //mysql command to access the database
+            db.connection.query(roleSql, (err, data) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+                if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+                const roles = data.map(({ id, title }) => ({ name: title, value: id })); //Variable that pulls all the roles available from the database
+                inquirer.prompt([ //Runs inquirer so user can make selections
                     {
-                        type: "list",
-                        name: "role",
-                        message: "Employee's new role: ",
-                        choices: roles
+                        type: "list", //The type of prompt
+                        name: "role", //The name of the prompt
+                        message: "Employee's new role: ", //The message the user sees for the prompt
+                        choices: roles //The choices the user has for the menu selection within the prompt
                     }
-                ]).then(roleChoice => {
-                    const role = roleChoice.role;
-                    params.push(role);
-                    let employee = params[0];
-                    params[0] = role;
-                    params[1] = employee;
-                    const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
-                    db.connection.query(sql, params, (err, result) => {
-                        if (err) throw err;
-                        console.log("Employee has been updated");
-                        viewEmployees();
+                ]).then(roleChoice => { //After user enter information we take the information and proceed further into more prompts
+                    const role = roleChoice.role; //The role the user selected is stored as the sole role
+                    params.push(role); //The user's selected role is pushed into the database
+                    let employee = params[0]; //Array that will store the new employees information
+                    params[0] = role; //Adding the employee's new role into the array
+                    params[1] = employee; //Adding the rest of the employee's information into the array
+                    const sql = `UPDATE employee SET role_id = ? WHERE id = ?;` //mysql command to access the database
+                    db.connection.query(sql, params, (err, result) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+                        if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+                        console.log("Employee has been updated"); //Displays to the console to let user know what is going on
+                        viewEmployees(); //Goes to the viewEmployees function
                     });
                 });
             });
@@ -196,108 +196,108 @@ updateRole = () => {
     });
 };
 
-viewRoles = () => {
-    const sql = `SELECT role.id, role.title FROM role;`
-    console.log("Pulling up all roles.\n");
-    db.connection.query(sql, (err, rows) => {
-        if (err) throw err;
-        console.table(rows);
-        userPrompt();
+viewRoles = () => { //Function that views roles
+    const sql = `SELECT role.id, role.title FROM role;` //mysql command to access the database
+    console.log("Pulling up all roles.\n"); //Displays to the console to let user know what is going on
+    db.connection.query(sql, (err, rows) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+        if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+        console.table(rows); //Displays the data from the database
+        userPrompt(); //Calls userPrompt function to get user's input for menu selection
     });
 };
 
-addRole = () => {
-    inquirer.prompt([
+addRole = () => { //Function that adds roles
+    inquirer.prompt([ //Runs inquirer so user can make selections
         {
-            type: "input",
-            name: "role",
-            message: "Role to add: ",
-            validate: addRole => {
-                if (addRole) {
-                    return true;
+            type: "input", //The type of prompt
+            name: "role", //The name of the prompt
+            message: "Role to add: ", //The message the user sees for the prompt
+            validate: addRole => { //Checks to make sure the user entered something
+                if (addRole) { //If the user entered something valid
+                    return true; //Returns true and continues
                 }
 
-                else {
-                    console.log("Please enter a role.");
-                    return false;
+                else { //If the user entered something invalid
+                    console.log("Please enter a role."); //Displays to the console that user needs to enter a valid response
+                    return false; //Returns false and lets user try the input again for the prompt
                 }
             }
         },
 
         {
-            type: "input",
-            name: "salary",
-            message: "Salary for this role: ",
-            validate: salary => {
-                if (isNaN(salary)) {
-                    console.log("Please enter a salary");
-                    return false;
+            type: "input", //The type of prompt
+            name: "salary", //The name of the prompt
+            message: "Salary for this role: ", //The message the user sees for the prompt
+            validate: salary => { //Checks to make sure the user entered something
+                if (isNaN(salary)) { //If the user entered something invalid
+                    console.log("Please enter a salary"); //Displays to the console that user needs to enter a valid response
+                    return false; //Returns false and lets user try the input again for the prompt
                 }
 
-                else {
-                    return true;
+                else { //If the user entered something valid
+                    return true; //Returns true and continues
                 }
             }
         }
-    ]).then(answer => {
-        const params = [answer.role, answer.salary];
-        const roleSql = `SELECT department_name, id FROM department;`
-        db.connection.query(roleSql, (err, data) => {
-            if (err) throw err;
-            const dept = data.map(({ department_name, id}) => ({ name: department_name, value: id }));
-            inquirer.prompt([
+    ]).then(answer => { //After user enter information we take the information and proceed further into more prompts
+        const params = [answer.role, answer.salary]; //Stores the user's respones into an array
+        const roleSql = `SELECT department_name, id FROM department;` //mysql command to access the database
+        db.connection.query(roleSql, (err, data) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+            if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+            const dept = data.map(({ department_name, id}) => ({ name: department_name, value: id })); //Variable that pulls all the departments available from the database
+            inquirer.prompt([ //Runs inquirer so user can make selections
                 {
-                    type: "list",
-                    name: "dept",
-                    message: "Department belonging to this role: ",
-                    choices: dept
+                    type: "list", //The type of prompt
+                    name: "dept", //The name of the prompt
+                    message: "Department belonging to this role: ", //The message the user sees for the prompt
+                    choices: dept //The choices the user has for the menu selection within the prompt
                 }
-            ]).then(deptChoice => {
-                const dept = deptChoice.dept;
-                params.push(dept);
-                const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);`
-                db.connection.query(sql, params, (err, result) => {
-                    if (err) throw err;
-                    console.log("Added " + answer.role + " to roles");
-                    viewRoles();
+            ]).then(deptChoice => { //After user enter information we take the information and proceed further into more prompts
+                const dept = deptChoice.dept; //The department the user selected is stored as the sole department
+                params.push(dept); //The user's selected department is pushed into the database
+                const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);` //mysql command to access the database
+                db.connection.query(sql, params, (err, result) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+                    if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+                    console.log("Added " + answer.role + " to roles"); //Displays to the console to let user know what is going on
+                    viewRoles(); //Goes to the viewRoles function
                 });
             });
         });
     });
 };
 
-viewDepartments = () => {
-    const sql = `SELECT department.id, department.department_name FROM department;`
-    console.log("Pulling up all departments.\n");
-    db.connection.query(sql, (err, rows) => {
-        if (err) throw err;
-        console.table(rows);
-        userPrompt();
+viewDepartments = () => { //Function that views departments
+    const sql = `SELECT department.id, department.department_name FROM department;` //mysql command to access the database
+    console.log("Pulling up all departments.\n"); //Displays to the console to let user know what is going on
+    db.connection.query(sql, (err, rows) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+        if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+        console.table(rows); //Displays the data from the database
+        userPrompt(); //Calls userPrompt function to get user's input for menu selection
     });
 };
 
-addDepartment = () => {
-    inquirer.prompt([
+addDepartment = () => { //Function that adds departments
+    inquirer.prompt([ //Runs inquirer so user can make selections
         {
-            type: "input",
-            name: "addDepartmentPrompt",
-            message: "Department to add: ",
-            validate: addDepartmentPrompt => {
-                if(addDepartmentPrompt) {
-                    return true;
+            type: "input", //The type of prompt
+            name: "addDepartmentPrompt", //The name of the prompt
+            message: "Department to add: ", //The message the user sees for the prompt
+            validate: addDepartmentPrompt => { //Checks to make sure the user entered something
+                if(addDepartmentPrompt) { //If the user entered something valid
+                    return true; //Returns true and continues
                 }
-                else {
-                    console.log("Enter a valid department.");
-                    return false;
+                else { //If the user entered something invalid
+                    console.log("Enter a valid department."); //Displays to the console that user needs to enter a valid response
+                    return false; //Returns false and lets user try the input again for the prompt
                 }
             }
         }
-    ]).then(answer => {
-        const sql = `INSERT INTO department (department_name) VALUES (?);`
-        db.connection.query(sql, answer.addDepartmentPrompt, (err, result) => {
-            if (err) throw err;
-            console.log("Added" + answer.addDepartmentPrompt + "department.");
-            viewDepartments();
+    ]).then(answer => { //After user enter information we take the information and proceed further into more prompts
+        const sql = `INSERT INTO department (department_name) VALUES (?);` //mysql command to access the database
+        db.connection.query(sql, answer.addDepartmentPrompt, (err, result) => { //Runs the mysql command to the database and if all goes well it displays the data in the database
+            if (err) throw err; //Displays an error if access to the database wasn't granted or we couldn't get the information correctly
+            console.log("Added" + answer.addDepartmentPrompt + "department."); //Displays to the console to let user know what is going on
+            viewDepartments(); //Goes to the viewDepartments function
         });
     });
 };
